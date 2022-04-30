@@ -37,6 +37,10 @@ node_dict = {"node" + str(i+1): {"name" : list(G.nodes)[i]} for i in range(len(G
 edge_dict = {"edge" + str(i+1): {"source" : "node" + str(list(G.nodes).index(list(G.edges)[i][0]) + 1) ,"target": "node" + str(list(G.nodes).index(list(G.edges)[i][1]) + 1)}  for i in range(len(G.edges))}
 print(edge_dict)
 
+
+
+
+
 # v_q = pql.PQL()
 # v_q += pql.PQLColumn('"mobis_challenge_log_2019_csv"."ACTIVITY"')
 # v_q += pql.PQLColumn('')
