@@ -68,7 +68,7 @@ def getDFG():
     ngraph = nx.DiGraph()
     ngraph.add_edges_from(dfg)
     node_dict = {"node" + str(i+1): {"name" : list(ngraph.nodes)[i]} for i in range(len(ngraph.nodes))}
-    edge_dict = {"edge" + str(i+1): {"source" : "node" + list(ngraph.nodes).index(list(ngraph.edges)[i][0]) + 1 ,"target": "node" + list(ngraph.nodes).index(list(ngraph.edges)[i][1]) + 1}  for i in range(len(ngraph.edges))}
+    edge_dict = {"edge" + str(i+1): {"source" : "node" + str(list(ngraph.nodes).index(list(ngraph.edges)[i][0]) + 1) ,"target": "node" + str(list(ngraph.nodes).index(list(ngraph.edges)[i][1]) + 1)}  for i in range(len(ngraph.edges))}
     return make_response({'dfg_nodes': node_dict,
                           'dfg_edges': edge_dict})
 
