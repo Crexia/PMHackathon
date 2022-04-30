@@ -221,3 +221,5 @@ def getAllClusterCharts():
 #     count_array = [variant.loc[variant["ACTIVITY"] == activity]["COUNT"].to_list()[0] if activity in variant["ACTIVITY"].unique() else 0 for activity in activities]
 #     return_array = [item / max(count_array) for item in count_array]
 #     return make_response({'chart_data': return_array})
+
+#TESTTTTT
