@@ -158,3 +158,36 @@ def getClusterChart():
     max_sum = max(sum_array)
     return_array = [item / max_sum  for item in sum_array]
     return make_response({'chart_data': return_array})
+
+@app.route('/get_all_cluster_charts/', methods=['POST','GET'])
+def getAllClusterCharts():
+
+    global chartsdf
+    activities = chartsdf['ACTIVITY'].unique()
+    print(chartsdf)
+    for cluster in chartsdf['CLUSTER'].unique():
+        all_clusters = []
+        sum_array = []
+        for activity in activities:
+            sum_array.append(chartsdf.loc[(chartsdf["CLUSTER"] == int(cluster)) & (chartsdf["ACTIVITY"] == activity)]["COUNT"].sum())
+        max_sum = max(sum_array)
+        return_array = [item / max_sum  for item in sum_array]
+        all_clusters.append(return_array)
+
+    return make_response({'all_chart_data': all_clusters})
+
+# @app.route('/get_variant_chart/', methods=['POST','GET'])
+# def getVariantChart():
+#     if 'variant' not in request.form.keys():
+#         return make_response({'error': 'No cluster specified'}, 401)
+#     variant = request.form['variant']
+
+#     global chartsdf
+#     sum_array = []
+#     activities = chartsdf['ACTIVITY'].unique()
+
+#     variant = 
+
+#     count_array = [variant.loc[variant["ACTIVITY"] == activity]["COUNT"].to_list()[0] if activity in variant["ACTIVITY"].unique() else 0 for activity in activities]
+#     return_array = [item / max(count_array) for item in count_array]
+#     return make_response({'chart_data': return_array})

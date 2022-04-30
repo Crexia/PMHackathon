@@ -26,18 +26,22 @@ log = pm4py.convert_to_event_log(mobis_table)
 
 dfg = dfg_discovery.apply(log)
 
-gviz = dfg_visualization.apply(dfg, log=log, variant=dfg_visualization.Variants.FREQUENCY)
-dfg_visualization.view(gviz)
+
 
 
 G = nx.DiGraph()
 G.add_edges_from(dfg)
 
-node_dict = {"node" + str(i+1): {"name" : list(G.nodes)[i]} for i in range(len(G.nodes))}
-edge_dict = {"edge" + str(i+1): {"source" : "node" + str(list(G.nodes).index(list(G.edges)[i][0]) + 1) ,"target": "node" + str(list(G.nodes).index(list(G.edges)[i][1]) + 1)}  for i in range(len(G.edges))}
-print(edge_dict)
+loop_activities = set([node for cycle in nx.simple_cycles(G) for node in cycle])
 
+print(loop_activities)
 
+# node_dict = {"node" + str(i+1): {"name" : list(G.nodes)[i]} for i in range(len(G.nodes))}
+# edge_dict = {"edge" + str(i+1): {"source" : "node" + str(list(G.nodes).index(list(G.edges)[i][0]) + 1) ,"target": "node" + str(list(G.nodes).index(list(G.edges)[i][1]) + 1)}  for i in range(len(G.edges))}
+# print(edge_dict)
+
+gviz = dfg_visualization.apply(dfg, log=log, variant=dfg_visualization.Variants.FREQUENCY)
+dfg_visualization.view(gviz)
 
 
 
