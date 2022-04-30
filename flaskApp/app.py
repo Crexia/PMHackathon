@@ -67,13 +67,20 @@ def getDFG():
 
     ngraph = nx.DiGraph()
     ngraph.add_edges_from(dfg)
-    # print("Is gra")
     json_ngraph = nx.node_link_data(ngraph)
-    # print(json_ngraph)
     print(ngraph.nodes)
     print(ngraph.edges)
     return make_response({'dfg_nodes': ngraph.nodes,
                           'dfg_edges': ngraph.edges})
+
+@app.route('/get_filter', methods=['POST', 'GET'])
+def filterCluster():
+    global log
+    print(log)
+    filter_out_acts = request.form['list_act']
+
+
+
 
 @app.route('/get_activity_freq/', methods=['POST', 'GET'])
 def getFreq():
