@@ -70,8 +70,10 @@ def getDFG():
     json_ngraph = nx.node_link_data(ngraph)
     print(ngraph.nodes)
     print(ngraph.edges)
-    return make_response({'dfg_nodes': ngraph.nodes,
-                          'dfg_edges': ngraph.edges})
+    node_dict = {"node" + str(i+1): {"name" : list(ngraph.nodes)[i]} for i in range(len(ngraph.nodes))}
+    edge_dict = {"edge" + str(i+1): {"source" : list(ngraph.edges)[i][0] ,"target":list(ngraph.edges)[i][1]} for i in range(len(ngraph.edges))}
+    return make_response({'dfg_nodes': node_dict,
+                          'dfg_edges': edge_dict})
 
 @app.route('/get_filter', methods=['POST', 'GET'])
 def filterCluster():

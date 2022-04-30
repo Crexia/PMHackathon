@@ -17,7 +17,7 @@ q += pql.PQLColumn('"mobis_challenge_log_2019_csv_CASES"."CASE"',"case:concept:n
 q += pql.PQLColumn('"mobis_challenge_log_2019_csv"."ACTIVITY"',"concept:name")
 q += pql.PQLColumn('"mobis_challenge_log_2019_csv"."START"',"time:timestamp")
 # q += pql.PQLColumn(' CLUSTER_VARIANTS(VARIANT("mobis_challenge_log_2019_csv"."ACTIVITY") , 87 , 3 )',"Clusters")
-q += pql.PQLFilter(' Filter CLUSTER_VARIANTS(VARIANT("mobis_challenge_log_2019_csv"."ACTIVITY") , 87 , 3 )  = 1')
+q += pql.PQLFilter(' Filter CLUSTER_VARIANTS(VARIANT("mobis_challenge_log_2019_csv"."ACTIVITY") , 87 , 3 )  = 4')
 mobis_table = mobis.get_data_frame(q)
 
 
@@ -33,6 +33,17 @@ dfg_visualization.view(gviz)
 G = nx.DiGraph()
 G.add_edges_from(dfg)
 
-print(G.nodes)
+node_dict = {"node" + str(i+1): {"name" : list(G.nodes)[i]} for i in range(len(G.nodes))}
+edge_dict = {"edge" + str(i+1): {"source" : list(G.edges)[i][0] ,"target":list(G.edges)[i][1]} for i in range(len(G.edges))}
+print(edge_dict)
+
+# v_q = pql.PQL()
+# v_q += pql.PQLColumn('"mobis_challenge_log_2019_csv"."ACTIVITY"')
+# v_q += pql.PQLColumn('')
+
+
+
+
+
 
 
