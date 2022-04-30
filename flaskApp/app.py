@@ -151,19 +151,10 @@ def getClusterChart():
     global chartsdf
     sum_array = []
     activities = chartsdf['ACTIVITY'].unique()
-    print(activities)
-    print(type(activities))
-    print(type(chartsdf.loc[0]['CLUSTER']))
+
+    print(chartsdf)
     for activity in activities:
-        # print(activity)
-
-        sum_array.append(chartsdf.loc[(chartsdf["CLUSTER"] == cluster) & (chartsdf["ACTIVITY"] == activity)]["COUNT"].sum())
-
-    # for x in chartsdf.index:
-    #     print(chartsdf.loc[x]['ACTIVITY'] + ' ' + activities.tolist()[0] + str(chartsdf.loc[x]['ACTIVITY'] == activities.tolist()[0]))
-    #     print(chartsdf.loc[x]['CLUSTER'] + ' ' + activities.tolist()[0] + str(chartsdf.loc[x]['CLUSTER'] == cluster))
+        sum_array.append(chartsdf.loc[(chartsdf["CLUSTER"] == int(cluster)) & (chartsdf["ACTIVITY"] == activity)]["COUNT"].sum())
     max_sum = max(sum_array)
-    print(str(sum_array))
-    print('Sum' + str(sum_array[0] / max_sum))
     return_array = [item / max_sum  for item in sum_array]
     return make_response({'chart_data': return_array})
