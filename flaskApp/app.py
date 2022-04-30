@@ -15,6 +15,7 @@ app = Flask(__name__)
 celonis = None
 df = None
 log = None
+chartsdf = None
 
 @app.route("/")
 def hello_world():
@@ -59,6 +60,34 @@ def getClusters():
 
     # return send_file('logs.xes', attachment_filename='logs.xes')
     return make_response({'logs': df.to_json()})
+
+@app.route('/get_charts_table/', methods=['POST', 'GET'])
+def getChartsTable():
+    print(request.form.keys())
+    if 'epsilon' not in request.form.keys():
+        return make_response({'error': 'No epsilon specified'}, 401)
+    epsilon = request.form['epsilon']
+
+    if 'min_pts' not in request.form.keys():
+        return make_response({'error': 'No epsilon specified'}, 401)
+    min_pts = request.form['min_pts']
+
+    global celonis
+
+    # GET DATA FROM CELONIS
+    mobis = celonis.datamodels.find("955669d9-c78c-49eb-9982-85af2a7d1e24")
+    print(mobis.tables.find('63cb0f9c-cbfd-4da0-b7a6-7232cba90992').columns)
+
+    q = pql.PQL()
+    q += pql.PQLColumn('VARIANT ( "mobis_challenge_log_2019_csv"."ACTIVITY" ) ',"VARIANTS")
+    q += pql.PQLColumn('"mobis_challenge_log_2019_csv"."ACTIVITY"',"ACTIVITY")
+    q += pql.PQLColumn('MAX ( INDEX_ACTIVITY_TYPE ( "mobis_challenge_log_2019_csv"."ACTIVITY" ))',"COUNT")
+    q += pql.PQLColumn('CLUSTER_VARIANTS ( VARIANT("mobis_challenge_log_2019_csv"."ACTIVITY"),' + min_pts + ', ' + epsilon +')', 'Cluster')
+
+    global chartsdf
+    chartsdf = mobis._get_data_frame(q)
+
+    return make_response({'logs': chartsdf.to_json()})
 
 @app.route('/get_dfg/', methods=['POST', 'GET'])
 def getDFG():
@@ -108,3 +137,18 @@ def filterCluster():
 def getFreq():
     pass
     # return make_response({'result': dfg})
+
+@app.route('/get_cluster_chart/', methods=['POST','GET'])
+def getClusterChart():
+    if 'cluster' not in request.form.keys():
+        return make_response({'error': 'No cluster specified'}, 401)
+    cluster = request.form['cluster']
+
+    global chartsdf
+    sum_array = []
+    activities = chartsdf['ACTIVITY'].unique()
+    for activity in activities:
+        sum_array.append(chartsdf.loc[(chartsdf["CLUSTER"] == cluster) & (chartsdf["ACTIVITY"] == activity)]["COUNT"].sum())
+    max_sum = max(sum_array)
+    return_array = [item / max_sum  for item in sum_array]
+    return make_response({'chart_data': return_array.to_json()})
