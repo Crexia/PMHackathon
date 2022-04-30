@@ -108,7 +108,7 @@ def getDFG():
                           'dfg_edges': edge_dict})
 
 @app.route('/get_filter', methods=['POST', 'GET'])
-def filterCluster():
+def filterAct():
     global log
     log_df = pm4py.convert_to_dataframe(log)
     filter_out_acts = None
@@ -134,6 +134,36 @@ def filterCluster():
     for x in df.index:
         if df.loc[x]['concept:name'] in filter_out_acts:
             df.drop(x, inplace = True)
+    print(len(df.index))
+    return make_response({'logs': df.to_json()})
+
+@app.route('/get_filter_cluster/', methods=['POST','GET'])
+def filterCluster():
+    global log
+    log_df = pm4py.convert_to_dataframe(log)
+    filter_out_clusters = None
+
+    print(request.form.keys())
+    print('list_act' in request.form.keys())
+
+    if 'list_act' in request.form.keys():
+        filter_out_clusters = request.form['list_act']
+    else:
+        return make_response({'error': " 'list_act' is missing"}, 401)
+
+    # try:
+    filter_out_clusters = '{\"list\":' + filter_out_clusters + '}'
+    print(filter_out_clusters)
+    filter_out_clusters = json.loads(filter_out_clusters)
+    filter_out_clusters = filter_out_clusters['list']
+    print(filter_out_clusters)
+
+    # print(df.loc[0]['Cluster'] == filter_out_clusters[0])
+
+    print(len(df.index))
+    for x in df.index:
+        if df.loc[x]['Cluster'] in filter_out_clusters:
+            df.drop(x, inplace=True)
     print(len(df.index))
     return make_response({'logs': df.to_json()})
 
