@@ -9,6 +9,8 @@ import pm4py
 import networkx as nx
 from pm4py.algo.filtering.pandas.attributes import attributes_filter
 import json
+import numpy
+import pandas as pd
 
 app = Flask(__name__)
 
@@ -82,10 +84,12 @@ def getChartsTable():
     q += pql.PQLColumn('VARIANT ( "mobis_challenge_log_2019_csv"."ACTIVITY" ) ',"VARIANTS")
     q += pql.PQLColumn('"mobis_challenge_log_2019_csv"."ACTIVITY"',"ACTIVITY")
     q += pql.PQLColumn('MAX ( INDEX_ACTIVITY_TYPE ( "mobis_challenge_log_2019_csv"."ACTIVITY" ))',"COUNT")
-    q += pql.PQLColumn('CLUSTER_VARIANTS ( VARIANT("mobis_challenge_log_2019_csv"."ACTIVITY"),' + min_pts + ', ' + epsilon +')', 'Cluster')
+    q += pql.PQLColumn('CLUSTER_VARIANTS ( VARIANT("mobis_challenge_log_2019_csv"."ACTIVITY"),' + min_pts + ', ' + epsilon +')', 'CLUSTER')
 
     global chartsdf
     chartsdf = mobis._get_data_frame(q)
+
+    print(chartsdf)
 
     return make_response({'logs': chartsdf.to_json()})
 
@@ -147,8 +151,19 @@ def getClusterChart():
     global chartsdf
     sum_array = []
     activities = chartsdf['ACTIVITY'].unique()
+    print(activities)
+    print(type(activities))
+    print(type(chartsdf.loc[0]['CLUSTER']))
     for activity in activities:
+        # print(activity)
+
         sum_array.append(chartsdf.loc[(chartsdf["CLUSTER"] == cluster) & (chartsdf["ACTIVITY"] == activity)]["COUNT"].sum())
+
+    # for x in chartsdf.index:
+    #     print(chartsdf.loc[x]['ACTIVITY'] + ' ' + activities.tolist()[0] + str(chartsdf.loc[x]['ACTIVITY'] == activities.tolist()[0]))
+    #     print(chartsdf.loc[x]['CLUSTER'] + ' ' + activities.tolist()[0] + str(chartsdf.loc[x]['CLUSTER'] == cluster))
     max_sum = max(sum_array)
+    print(str(sum_array))
+    print('Sum' + str(sum_array[0] / max_sum))
     return_array = [item / max_sum  for item in sum_array]
-    return make_response({'chart_data': return_array.to_json()})
+    return make_response({'chart_data': return_array})
