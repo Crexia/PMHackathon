@@ -7,6 +7,8 @@ from pm4py.objects.log.exporter.xes import exporter as xes_exporter
 from pm4py.algo.discovery.dfg import algorithm as dfg_discovery
 import pm4py
 import networkx as nx
+from pm4py.algo.filtering.pandas.attributes import attributes_filter
+import json
 
 app = Flask(__name__)
 
@@ -22,11 +24,11 @@ def hello_world():
 def getClusters():
     print(request.form.keys())
     if 'epsilon' not in request.form.keys():
-        return make_response({'error': 'No epsilon specified'})
+        return make_response({'error': 'No epsilon specified'}, 401)
     epsilon = request.form['epsilon']
 
     if 'min_pts' not in request.form.keys():
-        return make_response({'error': 'No epsilon specified'})
+        return make_response({'error': 'No epsilon specified'}, 401)
     min_pts = request.form['min_pts']
 
     global celonis
@@ -75,11 +77,32 @@ def getDFG():
 @app.route('/get_filter', methods=['POST', 'GET'])
 def filterCluster():
     global log
-    print(log)
-    filter_out_acts = request.form['list_act']
+    log_df = pm4py.convert_to_dataframe(log)
+    filter_out_acts = None
 
+    print(request.form.keys())
+    print('list_act' in request.form.keys())
 
+    if 'list_act' in request.form.keys():
+        filter_out_acts = request.form['list_act']
+    else:
+        return make_response({'error': " 'list_act' is missing"}, 401)
 
+    # try:
+    filter_out_acts = '{\"list\":' + filter_out_acts + '}'
+    print(filter_out_acts)
+    filter_out_acts = json.loads(filter_out_acts)
+    filter_out_acts = filter_out_acts['list']
+    print(filter_out_acts)
+
+    print(df.loc[0]['concept:name'] == filter_out_acts[0])
+
+    print(len(df.index))
+    for x in df.index:
+        if df.loc[x]['concept:name'] in filter_out_acts:
+            df.drop(x, inplace = True)
+    print(len(df.index))
+    return make_response({'logs': df.to_json()})
 
 @app.route('/get_activity_freq/', methods=['POST', 'GET'])
 def getFreq():
